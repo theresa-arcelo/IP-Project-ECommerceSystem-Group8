@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TalaTrade - Product Details</title>
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .breadcrumb { width: 80%; margin: 20px auto 0; font-size: 13px; color: #888; }
+  .breadcrumb a { color: #8a0154; }
+  .breadcrumb span { margin: 0 6px; }
+
+  .product-main {
+    display: flex;
+    gap: 50px;
+    width: 80%;
+    margin: 25px auto 40px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(138, 1, 84, 0.08);
+  }
+
+  .product-image-col {
+    flex: 1;
+    position: relative;
+  }
+
+  .product-image-col img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #eee;
+    border: 4px solid #fad2ef;
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #8a0154;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .product-details-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .product-details-col .category-tag {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #f453ad;
+    font-weight: 700;
+  }
+
+  .product-details-col h1 {
+    font-size: 30px;
+    line-height: 1.2;
+    color: #222;
+  }
+
+  .product-rating {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 14px;
+    color: #666;
+  }
+
+  .product-rating .stars { color: #f453ad; }
+
+  .product-details-col .price {
+    font-size: 36px;
+    font-weight: 700;
+    color: #8a0154;
+  }
+
+  .product-details-col .description {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  .stock-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #2a7d2a;
+    font-weight: 600;
+  }
+
+  .stock-indicator::before {
+    content: "●";
+    color: #2a7d2a;
+    font-size: 14px;
+  }
+
+  .quantity-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 5px 0;
+  }
+
+  .quantity-row label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+  }
+
+  .quantity-row input {
+    width: 80px;
+    padding: 10px;
+    border: 1px solid #f453ad;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 15px;
+  }
+
+  .product-details-col .btn {
+    padding: 14px;
+    font-size: 15px;
+    width: 100%;
+    margin-top: 5px;
+  }
+
+  .product-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-top: 15px;
+    padding-top: 18px;
+    border-top: 1px solid #fad2ef;
+  }
+
+  .product-features div {
+    font-size: 12px;
+    color: #666;
+  }
+
+  .product-features div strong {
+    color: #8a0154;
+    display: block;
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+
+  .section-title {
+    text-align: center;
+    margin: 40px 0 10px;
+  }
+
+  .section-title h2 {
+    font-size: 26px;
+    color: #8a0154;
+  }
+
+  .section-title p {
+    font-size: 14px;
+    color: #666;
+    margin-top: 6px;
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+    padding: 25px 60px 50px;
+  }
+
+  .related-card {
+    border: 3px solid #fad2ef;
+    padding: 14px;
+    border-radius: 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .related-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(138, 1, 84, 0.15);
+  }
+
+  .related-card img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    background: #eee;
+    border-radius: 6px;
+  }
+
+  .related-card h4 {
+    font-size: 14px;
+    color: #222;
+    min-height: 36px;
+  }
+
+  .related-card .price {
+    color: #8a0154;
+    font-weight: 700;
+    font-size: 18px;
+  }
+
+  @media (max-width: 900px) {
+    .product-main { flex-direction: column; width: 92%; }
+    .product-image-col img { height: 280px; }
+    .related-grid { grid-template-columns: repeat(2, 1fr); padding: 20px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><span>★</span> TalaTrade</div>
+  <nav class="nav-links">
+    <a href="user_home.html">Home</a>
+    <a href="user_home.html" class="active">Shop</a>
+    <a href="#">About Us</a>
+  </nav>
+  <div class="actions">
+    <button class="btn btn-outline">Cart</button>
+    <button class="btn">Account</button>
+    <button class="btn btn-outline">Log Out</button>
+  </div>
+</header>
+
+<div class="breadcrumb">
+  <a href="user_home.html">Home</a><span>/</span>
+  <a href="user_home.html">Cooking</a><span>/</span>
+  Ajinomoto Seasoning (11g)
+</div>
+
+<section class="product-main">
+  <div class="product-image-col">
+    <span class="product-badge">In Stock</span>
+    <img src="images/placeholder.png" alt="Ajinomoto Seasoning">
+  </div>
+
+  <div class="product-details-col">
+    <p class="category-tag">Cooking</p>
+    <h1>Ajinomoto Seasoning (11g)</h1>
+
+    <p class="price">₱5.00</p>
+
+    <p class="description">
+      A trusted everyday seasoning that brings out the natural umami flavor of your favorite dishes. Perfect for soups, stir-fries, and viands. Packed in a convenient 11g sachet — ideal for single-use cooking.
+    </p>
+
+    <span class="stock-indicator">87 units available</span>
+
+    <div class="quantity-row">
+      <label for="qty">Quantity:</label>
+      <input type="number" id="qty" value="1" min="1" max="87">
+    </div>
+
+    <a href="user_cart.html"><button class="btn">ADD TO CART</button></a>
+    <a href="user_home.html"><button class="btn btn-outline">CONTINUE SHOPPING</button></a>
+
+    <div class="product-features">
+      <div><strong>Secure Payment</strong>COD or QR Code</div>
+      <div><strong>Fast Delivery</strong>Cebu City & Liloan</div>
+      <div><strong>Easy Returns</strong>Within 24 hours</div>
+    </div>
+  </div>
+</section>
+
+<section class="section-title">
+  <h2>Related Products</h2>
+  <p>You may also like these items from the same category</p>
+</section>
+
+<section class="related-grid">
+  <div class="related-card">
+    <img src="images/placeholder.png" alt="Knorr Beef Cubes">
+    <p class="price">₱7.00</p>
+    <h4>Knorr Beef Cubes</h4>
+    <a href="user_product.html"><button class="btn">VIEW DETAILS</button></a>
+  </div>
+  <div class="related-card">
+    <img src="images/placeholder.png" alt="Knorr Crab and Corn Soup">
+    <p class="price">₱57.00</p>
+    <h4>Knorr Crab and Corn Soup</h4>
+    <a href="user_product.html"><button class="btn">VIEW DETAILS</button></a>
+  </div>
+  <div class="related-card">
+    <img src="images/placeholder.png" alt="Maggi Oyster Sauce">
+    <p class="price">₱8.00</p>
+    <h4>Maggi Oyster Sauce</h4>
+    <a href="user_product.html"><button class="btn">VIEW DETAILS</button></a>
+  </div>
+  <div class="related-card">
+    <img src="images/placeholder.png" alt="Maggi Magic Sarap">
+    <p class="price">₱6.00</p>
+    <h4>Maggi Magic Sarap</h4>
+    <a href="user_product.html"><button class="btn">VIEW DETAILS</button></a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div>
+    <h4>★ ABOUT US</h4>
+    <p><strong>May's Sari-Sari Store</strong> is located in <strong>Poblacion, Liloan</strong>, open from <strong>7:30 AM to 8:30 PM</strong>. With TalaTrade, we're now accepting online orders!</p>
+  </div>
+  <div class="footer-right">
+    <div><h4>★ EMAIL US</h4><p>emailaddress@gmail.com</p></div>
+    <div><h4>★ CALL US</h4><p>123 456 7890</p></div>
+    <div><h4>★ PRESENTED BY</h4><p>Arcelo, Calunsag, Dorego, & Jankovic</p></div>
+  </div>
+</footer>
+</body>
+</html>
