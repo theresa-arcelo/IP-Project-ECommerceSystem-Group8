@@ -1,6 +1,6 @@
 # TalaTrade
 
-**An Inventory and Online Shopping System for a General Merchandise Store**
+**An Inventory and Online Shopping System for General Merchandise Stores**
 
 TalaTrade is a web-based platform that combines inventory management and e-commerce for May's Sari-Sari Store, a locally owned general merchandise store in Liloan, Cebu. The system digitizes the store's manual stock tracking and sales recording while giving customers an online shopping alternative to the physical store.
 
@@ -16,9 +16,16 @@ TalaTrade is a web-based platform that combines inventory management and e-comme
 - Shopping cart and online checkout with integrated payment
 - Discount and promotional code features
 
+## API Integrations
+
+- **Payment Handling:** Securely processes online transactions and automatically updates order statuses via webhooks upon successful payment.
+- **Location:** Validates user-inputted shipping addresses against geocoded coordinates to ensure deliveries fall within the store's serviceable area.
+- **Email Notifications:** Automates transactional emails to customers, triggering order confirmation receipts or status updates when database records change.
+- **QR Code Generation:** Dynamically generates unique, scannable payment QR codes containing specific order IDs and total amounts to reduce user error.
+
 ## Scope & Limitations
 
-- Single currency (PHP) and single language only
+- Single currency (PHP) and single language (English) only
 - Deliveries limited to Cebu City
 - No barcode scanning, product reviews, real-time courier tracking, or advanced analytics
 - Designed to complement and not replace the physical store
