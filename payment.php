@@ -1,6 +1,9 @@
 <?php
 session_start();
 include 'db.php';
+require_once 'services/PayMongoQRService.php';
+require_once 'services/EmailService.php';
+require_once 'services/LocationService.php';
 
 if (!isset($_SESSION['userID'])) {
     header("Location: login.php");
@@ -10,6 +13,15 @@ if (!isset($_SESSION['userID'])) {
 $userID = $_SESSION['userID'];
 $total = isset($_SESSION['order_total']) ? $_SESSION['order_total'] : 0;
 $selectedPaymentMethod = $_SESSION['selected_payment_method'] ?? '';
+$qrImage = $_SESSION['payment_qr'] ?? null;
+$locationError = null;
+$orderError = null;
+
+$userStmt = $conn->prepare("SELECT fullname, shippingaddress, email FROM users WHERE userID = ?");
+$userStmt->bind_param("i", $userID);
+$userStmt->execute();
+$currentUser = $userStmt->get_result()->fetch_assoc();
+$customerEmail = $currentUser['email'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_payment_method'])) {
@@ -19,13 +31,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['submit_order'])) {
         $selectedPaymentMethod = $_POST['payment_method'] ?? ($_SESSION['selected_payment_method'] ?? '');
-        $couponCode = trim($_POST['coupon_code']);
-        
-        $discountID = null; 
+        $couponCode = trim($_POST['coupon_code'] ?? '');
+
+        $discountID = null;
         $finalTotal = $total;
 
         if (isset($_FILES['senior_pwd_id']) && $_FILES['senior_pwd_id']['error'] === UPLOAD_ERR_OK) {
-            $discountID = 1; 
+            $discountID = 1;
         } elseif (!empty($couponCode)) {
             $stmt = $conn->prepare("SELECT discountID, discountedamount FROM discounts WHERE discountID = ?");
             $stmt->bind_param("s", $couponCode);
@@ -38,7 +50,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        if ($selectedPaymentMethod) {
+        $areaCheck = LocationService::isWithinServiceArea($currentUser['shippingaddress'] ?? '');
+        if (!$areaCheck['success']) {
+            $locationError = $areaCheck['error'];
+        } elseif (!$areaCheck['within_area']) {
+            $locationError = 'Your shipping address is outside our serviceable area ('
+                . $areaCheck['distance_km'] . ' km away). We currently deliver within '
+                . STORE_SERVICE_RADIUS_KM . ' km of Liloan, Cebu.';
+        }
+
+        if ($locationError === null && $selectedPaymentMethod) {
             $proof = (isset($_FILES['proof']) && $_FILES['proof']['error'] === UPLOAD_ERR_OK) ? 1 : 0;
             $now = date('Y-m-d H:i:s');
 
@@ -48,16 +69,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($stmt->execute()) {
                 $newOrderID = $conn->insert_id;
                 $_SESSION['last_order_id'] = $newOrderID;
-                
+
                 $upd = $conn->prepare("UPDATE orderlines SET orderID = ? WHERE orderID IS NULL");
                 $upd->bind_param("i", $newOrderID);
                 $upd->execute();
 
+                $itemsForEmail = [];
+                $lineStmt = $conn->prepare("SELECT p.productname, ol.quantity, ol.totalamount FROM orderlines ol INNER JOIN products p ON p.productID = ol.productID WHERE ol.orderID = ?");
+                $lineStmt->bind_param("i", $newOrderID);
+                $lineStmt->execute();
+                $lineRes = $lineStmt->get_result();
+                while ($line = $lineRes->fetch_assoc()) {
+                    $itemsForEmail[] = [
+                        'name' => $line['productname'],
+                        'qty' => $line['quantity'],
+                        'subtotal' => $line['totalamount'],
+                    ];
+                }
+
+                if (!empty($customerEmail)) {
+                    EmailService::sendOrderConfirmation($customerEmail, $currentUser['fullname'], $newOrderID, $finalTotal, $itemsForEmail);
+                }
+
+                if ($selectedPaymentMethod === 'QR') {
+                    $qrResult = PayMongoQRService::generateQR($finalTotal, 'TalaTrade Order #' . $newOrderID);
+                    if ($qrResult['success']) {
+                        $_SESSION['payment_qr'] = $qrResult['qr_image'];
+                        $qrImage = $qrResult['qr_image'];
+                    } else {
+                        $orderError = $qrResult['error'];
+                    }
+                }
+
                 unset($_SESSION['cart'], $_SESSION['order_total'], $_SESSION['selected_payment_method']);
-                header("Location: delivery.php");
-                exit();
+                if ($orderError === null) {
+                    header("Location: delivery.php");
+                    exit();
+                }
             } else {
-                $error = "Error placing order: " . $conn->error;
+                $orderError = "Error placing order: " . $conn->error;
             }
         }
     }
@@ -98,7 +148,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <h2>Payment Method</h2>
         </div>
 
-        <?php if(isset($error)) echo "<p style='color:#dc2626;'>$error</p>"; ?>
+        <?php if (!empty($locationError)) echo "<p style='color:#dc2626;'>" . htmlspecialchars($locationError) . "</p>"; ?>
+        <?php if (!empty($orderError)) echo "<p style='color:#dc2626;'>" . htmlspecialchars($orderError) . "</p>"; ?>
 
         <label class="payment-option <?php if ($selectedPaymentMethod === 'COD') echo 'active'; ?>">
           <input type="radio" name="payment_method" value="COD" <?php if ($selectedPaymentMethod === 'COD') echo 'checked'; ?> />
@@ -111,15 +162,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label class="payment-option <?php if ($selectedPaymentMethod === 'QR') echo 'active'; ?>">
           <input type="radio" name="payment_method" value="QR" <?php if ($selectedPaymentMethod === 'QR') echo 'checked'; ?> />
           <div class="payment-info">
-            <strong>Pay via QR Code</strong>
-            <small>Scan, pay, and upload your proof of payment</small>
+            <strong>Pay via QR Code (QR Ph)</strong>
+            <small>Scan with GCash, Maya, or any QR Ph-enabled app</small>
           </div>
         </label>
 
         <div class="qr-block" style="margin-top: 20px;">
-          <img src="images/qr.png" alt="QR Code">
+          <?php if (!empty($qrImage)): ?>
+            <img src="<?php echo htmlspecialchars($qrImage); ?>" alt="Scan to pay with QR Ph" style="width:200px;height:200px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;">
+          <?php else: ?>
+            <img src="images/qr.png" alt="QR Code Placeholder">
+          <?php endif; ?>
           <div class="qr-info">
-            <p><strong>After paying, please upload your Proof of Payment:</strong></p>
+            <p><strong>After paying, please upload your Proof of Payment (optional for QR Ph):</strong></p>
             <input type="file" name="proof" />
             <p style="font-size: 12px; color: #6b7280;">Accepted formats: JPG, PNG, PDF. Max size: 5MB.</p>
           </div>
@@ -133,12 +188,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <hr class="summary-divider">
 
         <input type="text" name="coupon_code" class="coupon-input" placeholder="Enter Discount Code Here" />
-        
+
         <div style="margin-bottom: 15px;">
           <p style="font-size: 13px; color: #4b5563; margin-bottom: 5px;">Senior Citizen / PWD ID (Optional)</p>
           <input type="file" name="senior_pwd_id" style="font-size: 12px;" />
         </div>
-        
+
         <hr class="summary-divider">
 
         <div class="summary-item">

@@ -409,6 +409,7 @@ CREATE TABLE `users` (
   `userID` int(11) NOT NULL,
   `password` varchar(100) DEFAULT NULL,
   `fullname` varchar(100) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
   `shippingaddress` varchar(100) DEFAULT NULL,
   `contactnumber` varchar(100) DEFAULT NULL,
   `roleID` int(11) NOT NULL DEFAULT 2
@@ -418,26 +419,26 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`userID`, `password`, `fullname`, `shippingaddress`, `contactnumber`, `roleID`) VALUES
-(1, 'password', 'Test Admin', NULL, NULL, 1),
-(2, 'password', 'Test User', NULL, NULL, 2),
-(4, '123', 'Theresa Arcelo', 'Liloan', '09458925494', 1),
-(5, '123', 'Zyleika Invento', 'Cebu City', '09105550664', 1),
-(6, '123', 'Queenie Piloton', 'Consolacion', '09195559249  ', 1),
-(7, '<39pX7G3g6C]', 'Jose Rizal', 'Compostela', '02835558654  ', 2),
-(8, 'X1{k~u\\+=083', 'Andres Bonifacio', 'Bogo', '02805550620  ', 2),
-(9, '9%b2Af5CX@c2', 'Leni Robredo', 'Carcar', '09225556214  ', 2),
-(10, 'z[OaH15e>6xf', 'Juan Luna', 'Carmen', '09325557340  ', 2),
-(11, 'Vav7-5=1;;4O', 'Melchora Aquino', 'Catmon', '09195556812  ', 2),
-(12, '1,G3r2}L,~JW', 'Gabriela Silang', 'Cordova', '09195555418  ', 2),
-(13, 'olRJv926rK98', 'Bini Mikha', 'Daan Bantayan', '09325550830  ', 2),
-(14, '9xY5oik91LSj', 'Bini Aiah', 'Danao', '09225559564  ', 2),
-(15, 'd1k82AwS116u', 'Bini Maloi', 'Dalaguete', '09195550516  ', 2),
-(16, '58zkzV0HtVp5', 'Bini Jhoanna', 'Moalboal', '09285552178  ', 2),
-(17, '|Ohs613#)bO4', 'Bini Colet', 'Oslob', '09085554432  ', 2),
-(18, '89Gk,kf4|+8*', 'Bini Sheena', 'Minglanilla', '09335552457  ', 2),
-(19, 'ZbP27#4m*?\\}', 'Bini Stacey', 'Naga', '09295558649  ', 2),
-(20, 'xY71zcEvl5i8', 'Bini Gwen', 'Sibonga', '09295550064', 2);
+INSERT INTO `users` (`userID`, `password`, `fullname`, `email`, `shippingaddress`, `contactnumber`, `roleID`) VALUES
+(1, 'password', 'Test Admin', 'arcelotheresa4444@gmail.com', 'Liloan', '09458925494', 1),
+(2, 'password', 'Test User', 'arcelotheresa4444@gmail.com', 'Liloan', '09458925494', 2),
+(4, '123', 'Theresa Arcelo', 'theresa.arcelo@talatrade.test', 'Liloan', '09458925494', 1),
+(5, '123', 'Zyleika Invento', 'zyleika.invento@talatrade.test', 'Cebu City', '09105550664', 1),
+(6, '123', 'Queenie Piloton', 'queenie.piloton@talatrade.test', 'Consolacion', '09195559249', 1),
+(7, '<39pX7G3g6C]', 'Jose Rizal', 'jose.rizal@talatrade.test', 'Compostela', '02835558654', 2),
+(8, 'X1{k~u\\+=083', 'Andres Bonifacio', 'andres.bonifacio@talatrade.test', 'Bogo', '02805550620', 2),
+(9, '9%b2Af5CX@c2', 'Leni Robredo', 'leni.robredo@talatrade.test', 'Carcar', '09225556214', 2),
+(10, 'z[OaH15e>6xf', 'Juan Luna', 'juan.luna@talatrade.test', 'Carmen', '09325557340', 2),
+(11, 'Vav7-5=1;;4O', 'Melchora Aquino', 'melchora.aquino@talatrade.test', 'Catmon', '09195556812', 2),
+(12, '1,G3r2}L,~JW', 'Gabriela Silang', 'gabriela.silang@talatrade.test', 'Cordova', '09195555418', 2),
+(13, 'olRJv926rK98', 'Bini Mikha', 'bini.mikha@talatrade.test', 'Daan Bantayan', '09325550830', 2),
+(14, '9xY5oik91LSj', 'Bini Aiah', 'bini.aiah@talatrade.test', 'Danao', '09225559564', 2),
+(15, 'd1k82AwS116u', 'Bini Maloi', 'bini.maloi@talatrade.test', 'Dalaguete', '09195550516', 2),
+(16, '58zkzV0HtVp5', 'Bini Jhoanna', 'bini.jhoanna@talatrade.test', 'Moalboal', '09285552178', 2),
+(17, '|Ohs613#)bO4', 'Bini Colet', 'bini.colet@talatrade.test', 'Oslob', '09085554432', 2),
+(18, '89Gk,kf4|+8*', 'Bini Sheena', 'bini.sheena@talatrade.test', 'Minglanilla', '09335552457', 2),
+(19, 'ZbP27#4m*?\\}', 'Bini Stacey', 'bini.stacey@talatrade.test', 'Naga', '09295558649', 2),
+(20, 'xY71zcEvl5i8', 'Bini Gwen', 'bini.gwen@talatrade.test', 'Sibonga', '09295550064', 2);
 
 --
 -- Indexes for dumped tables

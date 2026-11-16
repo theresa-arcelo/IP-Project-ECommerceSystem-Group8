@@ -8,9 +8,10 @@ if (isset($_POST['submit'])) {
     $address = $_POST['address'];
     $phone = $_POST['phone'];
     $role = $_POST['role'];
+    $email = $_POST['email'];
 
-    $stmt = $conn->prepare("INSERT INTO users (password, fullname, shippingaddress, contactnumber, roleID) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssi", $password, $name, $address, $phone, $role);
+    $stmt = $conn->prepare("INSERT INTO users (password, fullname, shippingaddress, contactnumber, roleID, email) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssis", $password, $name, $address, $phone, $role, $email);
 
     if ($stmt->execute()) {
         $_SESSION['userID'] = $conn->insert_id;
@@ -52,6 +53,8 @@ if (isset($_POST['submit'])) {
     <?php if (isset($error)) echo "<div class='error-msg'>$error</div>"; ?>
     <form method="POST" action="">
       <input type="text" placeholder="Full Name" name="name" required />
+      <input type="email" placeholder="Email Address" name="email" required />
+      
       <div class="password-wrapper">
         <input type="password" placeholder="Password" name="password" id="password" required />
         <i class="fa-solid fa-eye-slash toggle-password" id="togglePassword"></i>

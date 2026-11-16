@@ -1,6 +1,7 @@
 <?php
 include 'db.php';
 session_start();
+require_once 'services/EmailService.php';
 
 if (isset($_POST['update']) || isset($_POST['delete'])) {
     $orderID = $_POST['orderID'];
@@ -16,6 +17,17 @@ if (isset($_POST['update']) || isset($_POST['delete'])) {
         $stmt = $conn->prepare("UPDATE orders SET orderdatetime=?, totalamount=?, status=?, completeddatetime=?, paymentmethod=?, proofofpayment=? WHERE orderID=?");
         $stmt->bind_param("sdssssi", $orderdate, $total, $status, $completeddate, $paymentmethod, $proof, $orderID);
         $stmt->execute();
+
+        $u = $conn->prepare("SELECT u.fullname, u.email FROM users u INNER JOIN orders o ON o.userID=u.userID WHERE o.orderID=?");
+        $u->bind_param("i", $orderID);
+        $u->execute();
+        $r = $u->get_result();
+        if ($r && $r->num_rows > 0) {
+            $row = $r->fetch_assoc();
+            if (!empty($row['email'])) {
+                EmailService::sendStatusUpdate($row['email'], $row['fullname'], $orderID, $status);
+            }
+        }
     }
 
     if (isset($_POST['delete'])) {
